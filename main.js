@@ -9,8 +9,14 @@ const bot = new Discord.Client();
 
 const adminName = secret.admin.split('#');
 
-let channel;
+let channels;
 let lastTweetId = null;
+
+function sendToChannels(msg) {
+  channels.forEach((channel) => {
+    bot.sendMessage(channel, msg);
+  });
+}
 
 bot.on('ready', () => {
   const server = bot.servers.get('name', secret.server);
@@ -19,14 +25,21 @@ bot.on('ready', () => {
     throw new Error(`Not connected to server: ${secret.server}`);
   }
 
-  channel = bot.channels.filter((channel) => channel.server.name === secret.server && channel.name === secret.channel)[0];
+  channels = secret.channels.map((channelName) => {
+    const channel = bot.channels.filter((channel) => {
+      return channel.server.name === secret.server && channel.name === channelName;
+    })[0];
 
-  if (!channel) {
-    throw new Error(`Channel not found: #${secret.channel} on ${secret.server}`);
-  }
+    if (!channel) {
+      throw new Error(`Channel not found: #${channelName} on ${secret.server}`);
+    }
+
+    return channel;
+  });
+
 
   const admin = bot.users.getAll('username', adminName[0]).get('discriminator', adminName[1]);
-  bot.sendMessage(admin, `*** Giant Bot connected, outputting to #${secret.channel} on ${secret.server}`);
+  bot.sendMessage(admin, `*** Giant Bot connected, outputting to #${secret.channels.join(', #')} on ${secret.server}`);
 
   checkLiveStream();
   setInterval(checkLiveStream, 60 * 1000);
@@ -45,7 +58,7 @@ function checkLiveStream() {
       console.log('New tweet');
 
       if (lastTweetId !== null) {
-        bot.sendMessage(channel, resp[0].text);
+        sendToChannels(resp[0].text);
       }
 
       lastTweetId = latestId;

@@ -1,3 +1,5 @@
+discord bot that posts stream notifications from [@GiantBombLive](https://twitter.com/giantbomblive)
+
 secret.json format:
 
 ```
@@ -6,7 +8,7 @@ secret.json format:
   "password": "mypassword",
 
   "server": "server-name",
-  "channel": "general",
+  "channels": ["general"],
 
   "admin": "username#XXXX",
 
