@@ -35,6 +35,7 @@ function getBearer() {
     return resp.json();
   }).then((resp) => {
     console.log('Retrieved Twitter bearer token');
+    bearer = resp.access_token;
     return resp.access_token;
   });
 }
